@@ -1,6 +1,6 @@
 ﻿using LinqToDB.Mapping;
 
-namespace ORM
+namespace ORM.Models
 {
     [Table("Suppliers")]
     public class Supplier : BaseModel

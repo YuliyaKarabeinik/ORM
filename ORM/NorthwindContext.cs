@@ -1,5 +1,6 @@
 ﻿using LinqToDB;
 using LinqToDB.Data;
+using ORM.Models;
 
 namespace ORM
 {
@@ -26,5 +27,6 @@ namespace ORM
 
         public ITable<Shipper> Shippers => GetTable<Shipper>();
 
+        public ITable<OrderDetail> OrderDetails => GetTable<OrderDetail>();
     }
 }

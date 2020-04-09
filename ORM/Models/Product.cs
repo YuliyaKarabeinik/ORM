@@ -1,6 +1,6 @@
 ﻿using LinqToDB.Mapping;
 
-namespace ORM
+namespace ORM.Models
 {
     [Table("Products")]
     public class Product : BaseModel
@@ -28,14 +28,14 @@ namespace ORM
 
         [Association(
             ThisKey = nameof(CategoryId),
-            OtherKey = nameof(ORM.Category.CategoryId),
+            OtherKey = nameof(Models.Category.CategoryId),
             CanBeNull = true)]
         public Category Category { get; set; }
 
 
         [Association(
             ThisKey = nameof(SupplierId),
-            OtherKey = nameof(ORM.Supplier.SupplierId),
+            OtherKey = nameof(Models.Supplier.SupplierId),
             CanBeNull = true)]
         public Supplier Supplier { get; set; }
 

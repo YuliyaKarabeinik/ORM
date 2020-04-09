@@ -1,8 +1,6 @@
-﻿
-using System.Collections.Generic;
-using LinqToDB.Mapping;
+﻿using LinqToDB.Mapping;
 
-namespace ORM
+namespace ORM.Models
 {
     [Table("Territories")]
     public class Territory
@@ -18,14 +16,7 @@ namespace ORM
 
         [Association(
             ThisKey = nameof(RegionId),
-            OtherKey = nameof(ORM.Region.RegionId))]
+            OtherKey = nameof(Models.Region.RegionId))]
         public Region Region { get; set; }
-
-        public ICollection<Employee> Employees { get; set; }
-
-        [Association(
-            ThisKey = nameof(TerritoryId),
-            OtherKey = nameof(EmployeeTerritory.TerritoryId))]
-        public ICollection<EmployeeTerritory> EmployeeTerritories;
     }
 }

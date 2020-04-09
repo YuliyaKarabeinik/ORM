@@ -1,6 +1,6 @@
 ﻿using LinqToDB.Mapping;
 
-namespace ORM
+namespace ORM.Models
 {
     [Table("Region")]
     public class Region : BaseModel

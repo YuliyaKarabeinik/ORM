@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using LinqToDB.Mapping;
 
-namespace ORM
+namespace ORM.Models
 {
     [Table("Orders")]
     public class Order : BaseModel
@@ -24,13 +22,13 @@ namespace ORM
 
         [Association(
             ThisKey = nameof(EmployeeId), 
-            OtherKey = nameof(ORM.Employee.EmployeeId), 
+            OtherKey = nameof(Models.Employee.EmployeeId), 
             CanBeNull = true)]
         public Employee Employee { get; set; }
 
         [Association(
             ThisKey = nameof(ShipperId), 
-            OtherKey = nameof(ORM.Shipper.ShipperId), 
+            OtherKey = nameof(Models.Shipper.ShipperId), 
             CanBeNull = true)]
         public Shipper Shipper { get; set; }
 

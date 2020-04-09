@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace ORM
+namespace ORM.Models
 {
     public class BaseModel
     {

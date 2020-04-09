@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using LinqToDB.Mapping;
 
-namespace ORM
+namespace ORM.Models
 {
     [Table("Categories")]
     public class Category : BaseModel

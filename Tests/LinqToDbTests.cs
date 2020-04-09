@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using LinqToDB;
+using LinqToDB.Data;
 using NUnit.Framework;
 using ORM;
+using ORM.Models;
 using Tests.Configuration;
-using static ORM.Extensions.QueryExtensions;
 
 namespace Tests
 {
@@ -85,15 +87,15 @@ namespace Tests
         public void GetEmployeesWithShippersTest()
         {
             var result = (from emp in connection.Employees
-                join ord in connection.Orders on emp.EmployeeId equals ord.EmployeeId into temp1
-                from r1 in temp1.DefaultIfEmpty()
-                join sh in connection.Shippers on r1.ShipperId equals sh.ShipperId into temp2
-                from r2 in temp2.DefaultIfEmpty()
-                select new
-                {
-                    Employee = emp.EmployeeId,
-                    Shipper = r2.ShipperId,
-                })
+                          join ord in connection.Orders on emp.EmployeeId equals ord.EmployeeId into temp1
+                          from r1 in temp1.DefaultIfEmpty()
+                          join sh in connection.Shippers on r1.ShipperId equals sh.ShipperId into temp2
+                          from r2 in temp2.DefaultIfEmpty()
+                          select new
+                          {
+                              Employee = emp.EmployeeId,
+                              Shipper = r2.ShipperId,
+                          })
                 .Distinct().GroupBy(r => r.Employee).Select(p => new
                 {
                     EmployeeId = p.Key,
@@ -109,6 +111,94 @@ namespace Tests
                 }
                 Console.WriteLine();
             }
+        }
+
+        [Test]
+        public void AddEmployeeWithTerritories()
+        {
+            var employee = new Employee
+            {
+                FirstName = "Test First",
+                LastName = "Test Last"
+            };
+
+            employee.EmployeeId = Convert.ToInt32(connection.InsertWithIdentity(employee));
+
+            connection.Territories.Where(t => t.TerritoryDescription == "Boston")
+                .Insert(
+                    connection.EmployeeTerritories,
+                    t => new EmployeeTerritory
+                    {
+                        EmployeeId = employee.EmployeeId,
+                        TerritoryId = t.TerritoryId
+                    });
+        }
+
+        [Test]
+        public void ChangeProductsCategory()
+        {
+            var updatedCount = connection.Products
+                .Update(p => p.CategoryId == 1, pr =>
+                    new Product()
+                    {
+                        CategoryId = 2
+                    });
+        }
+
+        [Test]
+        public void AddProducts()
+        {
+            var products = new List<Product>
+            {
+                new Product
+                {
+                    ProductName = "Product1",
+                    Category = new Category {CategoryName = "Category1"},
+                    Supplier = new Supplier {CompanyName = "Supplier1"}
+                },
+                new Product
+                {
+                    ProductName = "Product2",
+                    Category = new Category {CategoryName = "Category1"},
+                    Supplier = new Supplier {CompanyName = "Supplier1"}
+                }
+            };
+
+            foreach (var product in products)
+            {
+                var category = connection.Categories
+                    .FirstOrDefault(c => c.CategoryName == product.Category.CategoryName);
+
+                product.CategoryId = category?.CategoryId ?? Convert.ToInt32(connection.InsertWithIdentity(
+                                         new Category
+                                         {
+                                             CategoryName = product.Category.CategoryName
+                                         }));
+
+               var supplier = connection.Suppliers
+                    .FirstOrDefault(c => c.CompanyName == product.Supplier.CompanyName);
+
+               product.SupplierId = supplier?.SupplierId ?? Convert.ToInt32(connection.InsertWithIdentity(
+                                        new Supplier
+                                        {
+                                            CompanyName = product.Supplier.CompanyName
+                                        }));
+            }
+
+            connection.BulkCopy(products);
+        }
+
+        [Test]
+        public void ChangeProduct()
+        {
+            connection.OrderDetails.LoadWith(od => od.Order).LoadWith(od => od.Product)
+                .Where(od => od.Order.ShippedDate == null)
+                .Update(od => new OrderDetail
+                {
+                    ProductId = connection.Products.FirstOrDefault(p => p.CategoryId ==od.Product.CategoryId && p.ProductId > od.ProductId) != null 
+                                ? connection.Products.First(p => p.CategoryId == od.Product.CategoryId && p.ProductId > od.ProductId).ProductId
+                                : connection.Products.First(p => p.CategoryId == od.Product.CategoryId && p.ProductId == od.ProductId).ProductId
+                });
         }
     }
 }
